@@ -6,4 +6,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          curl http://httpbin.org/get
+          read test
+          echo ${test}
