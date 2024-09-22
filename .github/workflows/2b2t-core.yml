@@ -29,7 +29,7 @@ jobs:
       - name: Comment and close PR
         if: env.forbidden == 'true'
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body "包含不允许修改的文件。"
+          gh pr comment ${{ github.event.pull_request.number }} --body "不允许修改README与核心控制文件。"
           gh pr close ${{ github.event.pull_request.number }}
 
       - name: Merge PR
