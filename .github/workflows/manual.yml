@@ -1,14 +1,35 @@
-on: push
+name: Auto Merge PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
 jobs:
-  build:
+  auto-merge:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: |
-          date > generated.txt
-          # Note: the following account information will not work on GHES
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "generated"
-          git push
+      - name: Check PR files
+        id: check_files
+        run: |
+          forbidden=false
+          pr_files=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path')
+
+          for file in $pr_files; do
+            if [[ $file == .github/* || $file == README.md ]]; then
+              forbidden=true
+              break
+            fi
+          done
+
+          echo "forbidden=$forbidden" >> $GITHUB_ENV
+
+      - name: Comment and close PR
+        if: env.forbidden == 'true'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "包含不允许修改的文件。"
+          gh pr close ${{ github.event.pull_request.number }}
+
+      - name: Merge PR
+        if: env.forbidden == 'false'
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} --merge
