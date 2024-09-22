@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize]
 env:
-    GH_TOKEN: ${{ github.token }}
+    GH_TOKEN: ${{ secrets.PAT }}
 jobs:
   auto-merge:
     permissions: write-all
@@ -26,7 +26,6 @@ jobs:
           done
 
           echo "forbidden=$forbidden" >> $GITHUB_ENV
-
       - name: Comment and close PR
         if: env.forbidden == 'true'
         run: |
