@@ -5,6 +5,5 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          read test
-          echo ${test}
+      - uses: actions/checkout@v4
+      
